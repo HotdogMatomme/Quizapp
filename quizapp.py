@@ -62,7 +62,7 @@ def fetch_questions(text_content, quiz_level):
     formatted_template = PROMPT_TEMPLATE.format(text_content=text_content, quiz_level=quiz_level, RESPONSE_JSON=RESPONSE_JSON)
 
     #Make API request 
-    response = client.chat.completions.create(model="GPT-4o",
+    response = client.chat.completions.create(model="gpt-3.5-turbo",
       messages=[
           {
                 "role": "user",
