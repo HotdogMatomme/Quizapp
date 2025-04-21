@@ -62,7 +62,7 @@ def fetch_questions(text_content, quiz_level):
     formatted_template = PROMPT_TEMPLATE.format(text_content=text_content, quiz_level=quiz_level, RESPONSE_JSON=RESPONSE_JSON)
 
     #Make API request 
-    response = client.chat.completions.create(model="chatgpt-4o-latest",
+    response = client.chat.completions.create(model="GPT-4o",
       messages=[
           {
                 "role": "user",
@@ -83,3 +83,47 @@ def fetch_questions(text_content, quiz_level):
 
     return json.loads(extracted_response).get("mcqs",[])
 
+def main():
+
+    st.title("Quiz Generator App")
+
+    #Text input for user to paste content
+    text_content = st.text_area("Paste the text content here:")
+
+    #Dropdown for selecting quiz level 
+    quiz_level = st.selectbox("Select quiz level:", ["Easy", "Medium", "Hard"])
+
+    #Convert quiz level to lower casing 
+    quiz_level_lower = quiz_level.lower()
+
+    if st.button("Generate Quiz"):
+        #Define questions and options 
+        questions = fetch_questions(text_content=text_content, quiz_level=quiz_level_lower)
+
+        #Display questions and radio buttons
+        selected_options = []
+        correct_answers = []
+        for question in questions:
+            options = list(question["options"].values())
+            selected_option = st.radio(question["mcq"], options, index=None)
+            selected_options.append(selected_option)
+            correct_answers.append(question["options"][question["correct"]])
+
+        #Submit button
+        if st.button("Submit"):
+            #display selected options 
+            marks = 0
+            st.header("Quiz Result:")
+            for i, question in enumerate(questions):
+                selected_option = selected_options[i]
+                correct_option = correct_answers[i]
+                st.subheader(f"{question["mcq"]}")
+                st.write(f"You selected: {selected_option}")
+                st.write(f"Correct answer: {correct_option}")
+                if selected_option == correct_option:
+                    marks += 1 
+            st.subheader(f"You scored {marks} out of {len(questions)}")
+
+
+if __name__ == "__main__":
+    main()
